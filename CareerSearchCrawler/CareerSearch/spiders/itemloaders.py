@@ -1,5 +1,5 @@
 from scrapy.contrib.loader import XPathItemLoader
-from CareerSearch.items import CareerItem
+from CareerSearch.items import CareerItem, PekingCareerItem
 
 
 class TsingHuaItemLoader(XPathItemLoader):
@@ -22,14 +22,14 @@ class PekingItemLoader(XPathItemLoader):
 
     def __init__(self, selector):
         self._selector = selector
-        super(PekingItemLoader, self).__init__(item=CareerItem(), selector=self._selector)
+        super(PekingItemLoader, self).__init__(item=PekingCareerItem(), selector=self._selector)
         self._init_path()
 
     def _init_path(self):
         self.add_xpath('title', '//li[@class="heicu"]/text()')
-        self.add_xpath('address', '//li[@class="wz1text"]/p[2]/b/text()')
-        self.add_xpath('begin_time', '//li[@class="wz1text"]/p[1]/b/text()')
+#        self.add_xpath('address', '//li[@class="wz1text"]/p[2]//span/text()')
+#        self.add_xpath('begin_time', '//li[@class="wz1text"]/p[1]//span/text()')
 #        self.add_xpath('end_time', '')
         self.add_xpath('post_time', '//ul[@class="wz1ul"]/li[2]/text()')
-        self.add_xpath('content', '//ul[@class="wz1ul"]')
-
+        self.add_xpath('content', '//li[@class="wz1text"]')
+        self.add_xpath('detail', '//li[@class="wz1text"]//text()')

@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 import re
+import time
 import hashlib
 from datetime import datetime
 from CareerSearch.utils import get_epoch_datetime
@@ -13,6 +14,8 @@ class CareerItemAdapterFactory(object):
 
         if source == TsingHuaItemAdapter.source:
             return TsingHuaItemAdapter()
+        elif source == PekingItemAdapter.source:
+            return PekingItemAdapter()
 
         return None
 
@@ -43,7 +46,7 @@ class TsingHuaItemAdapter(CareerItemAdapter):
         else:
             item['post_time'] = get_epoch_datetime()
         if item.has_key('content'):
-            item['content'] = self._get_content(item.get('content'))
+            item['content'] = _adapt_content_str(item.get('content'))
         item['end_time'] = 0
         return item
 
@@ -65,8 +68,56 @@ class PekingItemAdapter(CareerItemAdapter):
 
     def adapt(self, item):
         super(PekingItemAdapter, self).adapt(item)
-        if item.has_key('address'):
-            item['address'] = item['address']
+        if item.has_key('detail'):
+            self._get_detail_info(item)
+        if item.has_key('post_time'):
+            item['post_time'] = self._get_post_time(item['post_time'])
+        if item.has_key('content'):
+            item['content'] = _adapt_content_str(item['content'])
+        del item['detail']
+
+        return item
+
+    def _get_detail_info(self, item):
+        infos = item['detail'].replace(u'\uff1a', ':').split(u'\n')
+        for info in infos:
+            if u'\u65f6\u95f4:' in info.replace(' ', '') and not item.has_key('begin_time'):
+                item['begin_time'], item['end_time'] = self._get_begin_time(info.strip())
+            elif u'\u5730\u70b9:' in info.replace(' ', '') and not item.has_key('address'):
+                item['address'] = self._get_address(info.strip())
+
+    def _get_address(self, address):
+        return _adapt_colon_str(address, 1)
+
+    def _get_begin_time(self, begin_time):
+        begin_time = begin_time.replace(u'\xd0', '-').replace(' ', '')
+        pattern = '([\\d]{4})?.?([\\d]{1,2}).([\\d]{1,2})[^0-9]*([\\d]{1,2}):([\\d]{2})(\-([\\d]{1,2}):([\\d]{2}))?'
+        p = re.compile(pattern)
+        r = p.search(begin_time)
+        if r:
+            year, month, day, hour, minute, has_end_time, end_hour, end_minute = r.groups()
+            if not year:
+                year = time.localtime().tm_year
+            if u'\u665a' in begin_time or u'\u4e0b\u5348' in begin_time:
+                if int(hour) < 12:
+                    hour = int(hour) + 12
+
+        begin_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, hour, minute))
+        end_time = 0
+        if has_end_time:
+            end_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, end_hour, end_minute))
+        return begin_time, end_time
+
+    def _get_post_time(self, post_time):
+        return _adapt_date_str(post_time)
+
+def _adapt_content_str(content):
+    soup = BeautifulSoup(content)
+    for tag in soup():
+        for attribute in ['style', 'class', 'lang']:
+            del tag[attribute]
+    return str(soup)
+
 
 def _adapt_date_str(date_str):
     if not date_str:

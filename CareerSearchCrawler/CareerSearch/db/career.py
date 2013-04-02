@@ -65,11 +65,11 @@ def save_item(item, name):
 
 def _upsert_item(cursor, item):
 
-    sql = "INSERT INTO " + _table + " (" + string.join(item.fields.keys(), ',') + \
-          ") values (" + string.join(["%s"] * len(item.fields.keys()), ',') + \
-          ") ON DUPLICATE KEY UPDATE " + string.join([key + "=%s" for key in item.fields.keys() if item.get(key)], ',')
-    values = [item.get(key) for key in item.fields.keys()] + \
-                 [item.get(key) for key in item.fields.keys() if item.get(key)]
+    sql = "INSERT INTO " + _table + " (" + string.join(item.keys(), ',') + \
+          ") values (" + string.join(["%s"] * len(item.keys()), ',') + \
+          ") ON DUPLICATE KEY UPDATE " + string.join([key + "=%s" for key in item.keys() if item.get(key)], ',')
+    values = [item.get(key) for key in item.keys()] + \
+                 [item.get(key) for key in item.keys() if item.get(key)]
 
     cursor.execute(sql, tuple(values))
 

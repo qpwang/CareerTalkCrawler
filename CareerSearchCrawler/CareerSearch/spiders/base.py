@@ -1,5 +1,4 @@
 #-*- coding:utf-8 -*-
-import httplib, urllib
 from scrapy.contrib.spiders.crawl import CrawlSpider, Rule
 from scrapy.contrib.loader import XPathItemLoader
 from scrapy.http import Request
@@ -29,7 +28,8 @@ class CareerSpider(CrawlSpider):
 
     def start_requests(self):
         links = service.get_links(self.get_domain(), 0)
-#        links = ['http://scc.pku.edu.cn/zpxx/zphd/index.htm']
+#        links = ['http://scc.pku.edu.cn/zpxx/zphd/32975.htm']
+#        http://scc.pku.edu.cn/zpxx/zphd/34590.htm
         for link in links:
             yield self._create_request(link)
 
@@ -37,7 +37,7 @@ class CareerSpider(CrawlSpider):
         meta = {
                 'domain' : self.get_domain(),
                 'rules' : self.get_rule_list(),
-                'dont_redirect' : True,
+#                'dont_redirect' : True,
                 }
         callback = self.get_callback(link)
         return Request(url=link, callback=callback, meta=meta)
@@ -123,7 +123,8 @@ class CareerSpider(CrawlSpider):
             loader.add_value('source_link', url)
         except Exception, e:
             service.report_status([LinkStatus(url, source, Status.FAIL, LinkType.UNKNOWN)])
-            print e
+            print e, url
+            log_error(url)
 
         try:
             item = loader.load_item()
@@ -184,10 +185,6 @@ class CareerSpider(CrawlSpider):
         '''
         Override this method to custom the value of domain, by default is spider's name.
         '''
-        if self.name.startswith('update.'):
-            return self.name.replace('update.', '')
-        elif self.name.startswith('ipad.'):
-            return self.name.replace('ipad.', 'ipa.')
         return self.name
 
     def _compile_rule(self, rule_dict):

@@ -25,4 +25,7 @@ class CareerItem(CrawledItem):
     update_time = Field(output_processor=TakeFirst(),)
 
 class PekingCareerItem(CareerItem):
-    address = Field(default='', input_processor=MapCompose(unquote_markup, strip_space), output_processor=Join(),)
+    address = Field(default='', output_processor=Join(),)
+    begin_time = Field(default='', output_processor=Join(),)
+    detail = Field(default='', output_processor=Join(),)
+
