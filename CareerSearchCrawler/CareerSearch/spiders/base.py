@@ -27,8 +27,8 @@ class CareerSpider(CrawlSpider):
         super(CareerSpider, self).__init__(name, **kwarg)
 
     def start_requests(self):
-        links = service.get_links(self.get_domain(), 0)
-#        links = ['http://scc.pku.edu.cn/zpxx/zphd/32975.htm']
+#        links = service.get_links(self.get_domain(), 0)
+        links = ['http://career.ruc.edu.cn/']
 #        http://scc.pku.edu.cn/zpxx/zphd/34590.htm
         for link in links:
             yield self._create_request(link)

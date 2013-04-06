@@ -16,6 +16,8 @@ class CareerItemAdapterFactory(object):
             return TsingHuaItemAdapter()
         elif source == PekingItemAdapter.source:
             return PekingItemAdapter()
+        elif source == RenMinItemAdapter.source:
+            return RenMinItemAdapter()
 
         return None
 
@@ -110,6 +112,46 @@ class PekingItemAdapter(CareerItemAdapter):
 
     def _get_post_time(self, post_time):
         return _adapt_date_str(post_time)
+
+
+class RenMinItemAdapter(CareerItemAdapter):
+
+    source = 'renmin'
+
+    def adapt(self, item):
+        super(RenMinItemAdapter, self).adapt(item)
+        if item.has_key('address'):
+            item['address'] = self._get_address(item['address'])
+        if item.has_key('begin_time'):
+            item['begin_time'], item['end_time'] = self._get_begin_time(item['begin_time'])
+        if item.has_key('content'):
+            item['content'] = _adapt_content_str(item['content'])
+
+        item['post_time'] = 0
+
+        return item
+
+    def _get_address(self, address):
+        return _adapt_colon_str(address, 1)
+
+    def _get_begin_time(self, begin_time):
+        begin_time = begin_time.replace(u'\uff1a', ':').replace(u'\xd0', '-').replace(' ', '').replace(u'\xa0', '')
+        pattern = '([\\d]{4})?.?([\\d]{1,2}).([\\d]{1,2})[^0-9]*([\\d]{1,2}):([\\d]{2})(\-([\\d]{1,2}):([\\d]{2}))?'
+        p = re.compile(pattern)
+        r = p.search(begin_time)
+        if r:
+            year, month, day, hour, minute, has_end_time, end_hour, end_minute = r.groups()
+            if not year:
+                year = time.localtime().tm_year
+            if u'\u665a' in begin_time or u'\u4e0b\u5348' in begin_time:
+                if int(hour) < 12:
+                    hour = int(hour) + 12
+
+        begin_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, hour, minute))
+        end_time = 0
+        if has_end_time:
+            end_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, end_hour, end_minute))
+        return begin_time, end_time
 
 def _adapt_content_str(content):
     soup = BeautifulSoup(content)

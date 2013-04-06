@@ -1,4 +1,4 @@
-from CareerSearch.spiders.sourcelinkprocessors import TsingHuaSourceLinkProcessor, PekingSourceLinkProcessor
+from CareerSearch.spiders.sourcelinkprocessors import *
 
 
 class TsingHuaScriptProcessor():
@@ -23,6 +23,21 @@ class PekingScriptProcessor():
     def process(self, links):
         page_links = []
         processor = PekingSourceLinkProcessor()
+        for link in links:
+            link.url = processor.process(link.url)
+            if link.url:
+                page_links.append(link)
+
+        return page_links
+
+
+class RenMinScriptProcessor():
+
+    source = 'renmin'
+
+    def process(self, links):
+        page_links = []
+        processor = RenMinSourceLinkProcessor()
         for link in links:
             link.url = processor.process(link.url)
             if link.url:

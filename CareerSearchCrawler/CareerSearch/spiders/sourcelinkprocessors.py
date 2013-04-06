@@ -21,3 +21,11 @@ class PekingSourceLinkProcessor():
 
     def process(self, link):
         return link
+
+
+class RenMinSourceLinkProcessor():
+
+    base_url = 'http://career.ruc.edu.cn/article_show2.asp?id='
+
+    def process(self, link):
+        return link
