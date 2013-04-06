@@ -59,3 +59,18 @@ class BITScriptProcessor():
                 page_links.append(link)
 
         return page_links
+
+
+class BeiHangScriptProcessor():
+
+    source = 'beihang'
+
+    def process(self, links):
+        page_links = []
+        processor = BeiHangSourceLinkProcessor()
+        for link in links:
+            link.url = processor.process(link.url)
+            if link.url:
+                page_links.append(link)
+
+        return page_links

@@ -66,3 +66,15 @@ class BITItemLoader(XPathItemLoader):
         self.add_xpath('end_time', '//div[@class="cont_time"]/p[2]/text()')
         self.add_xpath('post_time', '//div[@class="cont1"]/table//td/text()')
         self.add_xpath('content', '//div[@class="cont1"]/div[2]')
+
+
+class BeiHangItemLoader(XPathItemLoader):
+
+    def __init__(self, selector):
+        self._selector = selector
+        super(BeiHangItemLoader, self).__init__(item=CareerItem(), selector=self._selector)
+        self._init_path()
+
+    def _init_path(self):
+        self.add_xpath('title', '//div[@class="ctitle ctitle1"]/text()')
+        self.add_xpath('content', '//div[@class="pbox_data"]')

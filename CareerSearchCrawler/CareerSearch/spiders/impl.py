@@ -2,9 +2,9 @@ import re
 import time
 from CareerSearch import service
 from CareerSearch.spiders.base import CareerSpider
-from CareerSearch.spiders.itemloaders import TsingHuaItemLoader, PekingItemLoader, RenMinItemLoader, BITItemLoader
-from CareerSearch.spiders.scriptprocessors import TsingHuaScriptProcessor, PekingScriptProcessor, RenMinScriptProcessor, BITScriptProcessor
-from CareerSearch.spiders.sourcelinkprocessors import TsingHuaSourceLinkProcessor, PekingSourceLinkProcessor, RenMinSourceLinkProcessor, BITSourceLinkProcessor
+from CareerSearch.spiders.itemloaders import *
+from CareerSearch.spiders.scriptprocessors import *
+from CareerSearch.spiders.sourcelinkprocessors import *
 from CareerSearch.gen.ttypes import LinkType
 
 
@@ -137,6 +137,36 @@ class BITSpider(CareerSpider):
                    },
                    {
                     'allow' : r'^http://job.bit.edu.cn/job/news.jhtml\?action=jobMeetingInfo&jobMeetingId=[0-9]+$',
+                    'process_links' : 'process_links',
+                    'check_url' : False,
+                    'link_type' : LinkType.LEAF
+                   },
+               ]
+
+
+class BeiHangSpider(CareerSpider):
+
+    name = 'beihang'
+    itemloader_class = BeiHangItemLoader
+    sourcelinkprocessor_class = BeiHangSourceLinkProcessor
+    scriptprocessor_class = BeiHangScriptProcessor
+
+    item_regexs = [re.compile(r'^http://career.buaa.edu.cn/website/zphxx/.*h$')]
+    def __init__(self, name=None, **kwarg):
+        super(BeiHangSpider, self).__init__(name, **kwarg)
+
+    def get_callback(self, link):
+        return self.parse_item if _matches(link, self.item_regexs) else self.parse
+
+    def get_rule_list(self):
+        return [
+                   {
+                    'allow' : r'^http://career.buaa.edu.cn/website/zphxx.h\?pageNo=[0-9]$',
+                    'process_links' : 'process_links',
+                    'check_url' : True,
+                   },
+                   {
+                    'allow' : r'^http://career.buaa.edu.cn/website/zphxx/.{24}\.h$',
                     'process_links' : 'process_links',
                     'check_url' : False,
                     'link_type' : LinkType.LEAF

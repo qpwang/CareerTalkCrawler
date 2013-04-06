@@ -28,7 +28,7 @@ class CareerSpider(CrawlSpider):
 
     def start_requests(self):
         links = service.get_links(self.get_domain(), 0)
-#        links = ['http://job.bit.edu.cn/job/news.jhtml?action=jobMeetingInfo&jobMeetingId=1451']
+#        links = ['http://career.buaa.edu.cn/website/zphxx/388e7d9b013d7bfc3c715f88.h']
 #        http://scc.pku.edu.cn/zpxx/zphd/34590.htm
         for link in links:
             yield self._create_request(link)

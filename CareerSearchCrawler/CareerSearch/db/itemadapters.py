@@ -20,6 +20,8 @@ class CareerItemAdapterFactory(object):
             return RenMinItemAdapter()
         elif source == BITItemAdapter.source:
             return BITItemAdapter()
+        elif source == BeiHangItemAdapter.source:
+            return BeiHangItemAdapter()
 
         return None
 
@@ -129,7 +131,7 @@ class RenMinItemAdapter(CareerItemAdapter):
         if item.has_key('content'):
             item['content'] = _adapt_content_str(item['content'])
 
-        item['post_time'] = 0
+        item['post_time'] = get_epoch_datetime()
 
         return item
 
@@ -180,6 +182,39 @@ class BITItemAdapter(CareerItemAdapter):
 
     def _get_time(self, time_str):
         time_str = _adapt_colon_str(time_str, 1)
+        time_str = _adapt_datetime_str(time_str)
+        return time_str
+
+
+class BeiHangItemAdapter(CareerItemAdapter):
+
+    source = 'beihang'
+
+    def adapt(self, item):
+        super(BeiHangItemAdapter, self).adapt(item)
+        if item.has_key('content'):
+            self._get_detail(item)
+            item['content'] = _adapt_content_str(item['content'])
+
+        item['post_time'] = get_epoch_datetime()
+
+        return item
+
+    def _get_detail(self, item):
+        for line in item['content'].split('<br>'):
+            if u'\u5f00\u59cb\u65f6\u95f4\uff1a' in line and not item.has_key('begin_time'):
+                item['begin_time'] = self._get_time(line)
+            elif u'\u7ed3\u675f\u65f6\u95f4\uff1a' in line and not item.has_key('end_time'):
+                item['end_time'] = self._get_time(line)
+            elif u'\u4e3e\u529e\u5730\u70b9\uff1a' in line and not item.has_key('address'):
+                item['address'] = self._get_address(line)
+
+    def _get_address(self, address):
+        address = address.split('</b>')[1].strip()
+        return address
+
+    def _get_time(self, time_str):
+        time_str = time_str.split('</b>')[1].strip()
         time_str = _adapt_datetime_str(time_str)
         return time_str
 

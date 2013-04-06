@@ -37,3 +37,11 @@ class BITSourceLinkProcessor():
 
     def process(self, link):
         return link
+
+
+class BeiHangSourceLinkProcessor():
+
+    base_url = 'http://career.buaa.edu.cn/website/zphxx/'
+
+    def process(self, link):
+        return link
