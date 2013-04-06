@@ -18,6 +18,8 @@ class CareerItemAdapterFactory(object):
             return PekingItemAdapter()
         elif source == RenMinItemAdapter.source:
             return RenMinItemAdapter()
+        elif source == BITItemAdapter.source:
+            return BITItemAdapter()
 
         return None
 
@@ -152,6 +154,35 @@ class RenMinItemAdapter(CareerItemAdapter):
         if has_end_time:
             end_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, end_hour, end_minute))
         return begin_time, end_time
+
+
+class BITItemAdapter(CareerItemAdapter):
+
+    source = 'bit'
+
+    def adapt(self, item):
+        super(BITItemAdapter, self).adapt(item)
+        if item.has_key('address'):
+            item['address'] = self._get_address(item['address'])
+        if item.has_key('begin_time'):
+            item['begin_time'] = self._get_time(item['begin_time'])
+        if item.has_key('end_time'):
+            item['end_time'] = self._get_time(item['end_time'])
+        if item.has_key('post_time'):
+            item['post_time'] = self._get_time(item['post_time'].split('\r')[0])
+        if item.has_key('content'):
+            item['content'] = _adapt_content_str(item['content'])
+
+        return item
+
+    def _get_address(self, address):
+        return _adapt_colon_str(address, 1)
+
+    def _get_time(self, time_str):
+        time_str = _adapt_colon_str(time_str, 1)
+        time_str = _adapt_datetime_str(time_str)
+        return time_str
+
 
 def _adapt_content_str(content):
     soup = BeautifulSoup(content)

@@ -2,9 +2,9 @@ import re
 import time
 from CareerSearch import service
 from CareerSearch.spiders.base import CareerSpider
-from CareerSearch.spiders.itemloaders import TsingHuaItemLoader, PekingItemLoader, RenMinItemLoader
-from CareerSearch.spiders.scriptprocessors import TsingHuaScriptProcessor, PekingScriptProcessor, RenMinScriptProcessor
-from CareerSearch.spiders.sourcelinkprocessors import TsingHuaSourceLinkProcessor, PekingSourceLinkProcessor, RenMinSourceLinkProcessor
+from CareerSearch.spiders.itemloaders import TsingHuaItemLoader, PekingItemLoader, RenMinItemLoader, BITItemLoader
+from CareerSearch.spiders.scriptprocessors import TsingHuaScriptProcessor, PekingScriptProcessor, RenMinScriptProcessor, BITScriptProcessor
+from CareerSearch.spiders.sourcelinkprocessors import TsingHuaSourceLinkProcessor, PekingSourceLinkProcessor, RenMinSourceLinkProcessor, BITSourceLinkProcessor
 from CareerSearch.gen.ttypes import LinkType
 
 
@@ -107,6 +107,36 @@ class RenMinSpider(CareerSpider):
                    },
                    {
                     'allow' : r'^http://career.ruc.edu.cn/article_show2\.asp\?id=[0-9]+$',
+                    'process_links' : 'process_links',
+                    'check_url' : False,
+                    'link_type' : LinkType.LEAF
+                   },
+               ]
+
+
+class BITSpider(CareerSpider):
+
+    name = 'bit'
+    itemloader_class = BITItemLoader
+    sourcelinkprocessor_class = BITSourceLinkProcessor
+    scriptprocessor_class = BITScriptProcessor
+
+    item_regexs = [re.compile(r'^http://job.bit.edu.cn/job/news.jhtml\?action=jobMeetingInfo&jobMeetingId=[0-9]+$')]
+    def __init__(self, name=None, **kwarg):
+        super(BITSpider, self).__init__(name, **kwarg)
+
+    def get_callback(self, link):
+        return self.parse_item if _matches(link, self.item_regexs) else self.parse
+
+    def get_rule_list(self):
+        return [
+                   {
+                    'allow' : r'^http://job.bit.edu.cn/job/news/jobMeetingAll.jhtml?page=[0-9]$',
+                    'process_links' : 'process_links',
+                    'check_url' : True,
+                   },
+                   {
+                    'allow' : r'^http://job.bit.edu.cn/job/news.jhtml\?action=jobMeetingInfo&jobMeetingId=[0-9]+$',
                     'process_links' : 'process_links',
                     'check_url' : False,
                     'link_type' : LinkType.LEAF

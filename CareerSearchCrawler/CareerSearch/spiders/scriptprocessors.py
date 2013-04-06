@@ -44,3 +44,18 @@ class RenMinScriptProcessor():
                 page_links.append(link)
 
         return page_links
+
+
+class BITScriptProcessor():
+
+    source = 'bit'
+
+    def process(self, links):
+        page_links = []
+        processor = BITSourceLinkProcessor()
+        for link in links:
+            link.url = processor.process(link.url)
+            if link.url:
+                page_links.append(link)
+
+        return page_links

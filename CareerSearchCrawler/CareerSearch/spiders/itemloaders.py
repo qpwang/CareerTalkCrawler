@@ -50,3 +50,19 @@ class RenMinItemLoader(XPathItemLoader):
         self.add_value('begin_time', begin_time)
         content = self.get_xpath('//body/table/tr[1]')[0] + self.get_xpath('//body/table/tr[2]')[0]
         self.add_value('content', content)
+
+
+class BITItemLoader(XPathItemLoader):
+
+    def __init__(self, selector):
+        self._selector = selector
+        super(BITItemLoader, self).__init__(item=CareerItem(), selector=self._selector)
+        self._init_path()
+
+    def _init_path(self):
+        self.add_xpath('title', '//h2/text()')
+        self.add_xpath('address', '//div[@class="cont_time"]/p[3]/text()')
+        self.add_xpath('begin_time', '//div[@class="cont_time"]/p[1]/text()')
+        self.add_xpath('end_time', '//div[@class="cont_time"]/p[2]/text()')
+        self.add_xpath('post_time', '//div[@class="cont1"]/table//td/text()')
+        self.add_xpath('content', '//div[@class="cont1"]/div[2]')

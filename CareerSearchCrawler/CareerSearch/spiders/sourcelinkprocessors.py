@@ -29,3 +29,11 @@ class RenMinSourceLinkProcessor():
 
     def process(self, link):
         return link
+
+
+class BITSourceLinkProcessor():
+
+    base_url = 'http://job.bit.edu.cn/job/news/jobMeetingAll.jhtml?page='
+
+    def process(self, link):
+        return link
