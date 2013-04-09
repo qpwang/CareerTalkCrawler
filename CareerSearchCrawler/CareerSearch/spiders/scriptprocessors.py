@@ -74,3 +74,19 @@ class BeiHangScriptProcessor():
                 page_links.append(link)
 
         return page_links
+
+
+class USTBScriptProcessor():
+
+    source = 'ustb'
+
+    def process(self, links):
+        page_links = []
+        processor = USTBSourceLinkProcessor()
+        for link in links:
+            link.url = processor.process(link.url)
+            if link.url:
+                page_links.append(link)
+
+        return page_links
+

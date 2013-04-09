@@ -29,3 +29,5 @@ class PekingCareerItem(CareerItem):
     begin_time = Field(default='', output_processor=Join(),)
     detail = Field(default='', output_processor=Join(),)
 
+class USTBCareerItem(CareerItem):
+    begin_time = Field(default='', output_processor=Join(),)

@@ -1,5 +1,5 @@
 from scrapy.contrib.loader import XPathItemLoader
-from CareerSearch.items import CareerItem, PekingCareerItem
+from CareerSearch.items import CareerItem, PekingCareerItem, USTBCareerItem
 
 
 class TsingHuaItemLoader(XPathItemLoader):
@@ -78,3 +78,17 @@ class BeiHangItemLoader(XPathItemLoader):
     def _init_path(self):
         self.add_xpath('title', '//div[@class="ctitle ctitle1"]/text()')
         self.add_xpath('content', '//div[@class="pbox_data"]')
+
+
+class USTBItemLoader(XPathItemLoader):
+
+    def __init__(self, selector):
+        self._selector = selector
+        super(USTBItemLoader, self).__init__(item=USTBCareerItem(), selector=self._selector)
+        self._init_path()
+
+    def _init_path(self):
+        self.add_xpath('title', '//td[@class="title"]/text()')
+        self.add_xpath('address', '//table[@id="zphxx"]//tr[2]/td/text()')
+        self.add_xpath('begin_time', '//table[@id="zphxx"]//tr[1]//text()')
+        self.add_xpath('content', '//table[@id="zphxx"]')

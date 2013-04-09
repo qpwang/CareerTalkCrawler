@@ -22,6 +22,8 @@ class CareerItemAdapterFactory(object):
             return BITItemAdapter()
         elif source == BeiHangItemAdapter.source:
             return BeiHangItemAdapter()
+        elif source == USTBItemAdapter.source:
+            return USTBItemAdapter()
 
         return None
 
@@ -217,6 +219,47 @@ class BeiHangItemAdapter(CareerItemAdapter):
         time_str = time_str.split('</b>')[1].strip()
         time_str = _adapt_datetime_str(time_str)
         return time_str
+
+
+class USTBItemAdapter(CareerItemAdapter):
+
+    source = 'ustb'
+
+    def adapt(self, item):
+        super(USTBItemAdapter, self).adapt(item)
+        if item.has_key('address'):
+            item['address'] = self._get_address(item['address'])
+        if item.has_key('begin_time'):
+            item['begin_time'], item['end_time'] = self._get_time(item['begin_time'])
+        if item.has_key('content'):
+            item['content'] = _adapt_content_str(item['content'])
+
+        item['post_time'] = get_epoch_datetime()
+
+        return item
+
+    def _get_address(self, address):
+        return address.strip()
+
+    def _get_time(self, time_str):
+        begin_time = time_str.split('-')[0].strip().replace(' ', '')
+        end_time = time_str.split('-')[1].strip().replace(' ', '')
+        pattern = '([\\d]{4}).([\\d]{1,2}).([\\d]{1,2})[^0-9]*([\\d]{1,2}):([\\d]{2})'
+        p = re.compile(pattern)
+        r1 = p.search(begin_time)
+        if r1:
+            year, month, day, hour, minute = r1.groups()
+            begin_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, hour, minute))
+        else:
+            begin_time = 0
+        r2 = p.search(end_time)
+        if r2:
+            year, month, day, hour, minute = r2.groups()
+            end_time = _adapt_datetime_str("%s-%s-%s %s:%s" % (year, month, day, hour, minute))
+        else:
+            end_time = 0
+        return begin_time, end_time
+
 
 
 def _adapt_content_str(content):

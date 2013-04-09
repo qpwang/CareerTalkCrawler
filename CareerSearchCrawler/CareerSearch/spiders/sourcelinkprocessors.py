@@ -45,3 +45,11 @@ class BeiHangSourceLinkProcessor():
 
     def process(self, link):
         return link
+
+
+class USTBSourceLinkProcessor():
+
+    base_url = 'http://job.ustb.edu.cn/accms/sites/jobc/zhaopinhuixinxi-content.jsp?contentId='
+
+    def process(self, link):
+        return link

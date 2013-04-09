@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 import re
 import time
 from CareerSearch import service
@@ -167,6 +168,52 @@ class BeiHangSpider(CareerSpider):
                    },
                    {
                     'allow' : r'^http://career.buaa.edu.cn/website/zphxx/.{24}\.h$',
+                    'process_links' : 'process_links',
+                    'check_url' : False,
+                    'link_type' : LinkType.LEAF
+                   },
+               ]
+
+
+class USTBSpider(CareerSpider):
+
+    name = 'ustb'
+    itemloader_class = USTBItemLoader
+    sourcelinkprocessor_class = USTBSourceLinkProcessor
+    scriptprocessor_class = USTBScriptProcessor
+
+    item_regexs = [re.compile(r'^http://job.ustb.edu.cn/accms/sites/jobc/zhaopinhuixinxi-content.jsp\?contentId=[0-9]+$')]
+    def __init__(self, name=None, **kwarg):
+        super(USTBSpider, self).__init__(name, **kwarg)
+
+    def start_requests(self):
+        links = service.get_links(self.get_domain(), 0)
+        base_url = 'http://job.ustb.edu.cn/accms/sites/jobc/zhaopinhuixinxi-list.jsp?fromDate=%s&F_FL1=校内&F_FL2='
+        week_day = time.localtime().tm_wday
+        time_str1 = '%4d%2.2d%2.2d' % (time.localtime(time.time() - 60 * 60 * 24 * week_day).tm_year, time.localtime(time.time() - 60 * 60 * 24 * week_day).tm_mon, time.localtime(time.time() - 60 * 60 * 24 * week_day).tm_mday)
+        time_str2 = '%4d%2.2d%2.2d' % (time.localtime(time.time() - 60 * 60 * 24 * (week_day - 7)).tm_year, time.localtime(time.time() - 60 * 60 * 24 * (week_day - 7)).tm_mon, time.localtime(time.time() - 60 * 60 * 24 * (week_day - 7)).tm_mday)
+        time_str3 = '%4d%2.2d%2.2d' % (time.localtime(time.time() - 60 * 60 * 24 * (week_day - 14)).tm_year, time.localtime(time.time() - 60 * 60 * 24 * (week_day - 14)).tm_mon, time.localtime(time.time() - 60 * 60 * 24 * (week_day - 14)).tm_mday)
+        time_str4 = '%4d%2.2d%2.2d' % (time.localtime(time.time() - 60 * 60 * 24 * (week_day - 21)).tm_year, time.localtime(time.time() - 60 * 60 * 24 * (week_day - 21)).tm_mon, time.localtime(time.time() - 60 * 60 * 24 * (week_day - 21)).tm_mday)
+        links.extend([base_url % time_str1,
+                      base_url % time_str2,
+                      base_url % time_str3,
+                      base_url % time_str4,
+                      ])
+        for link in links:
+            yield self._create_request(link)
+
+    def get_callback(self, link):
+        return self.parse_item if _matches(link, self.item_regexs) else self.parse
+
+    def get_rule_list(self):
+        return [
+                   {
+                    'allow' : r'^http://job.ustb.edu.cn/accms/sites/jobc/zhaopinhuixinxi-list.jsp\?fromDate=[0-9]{8}&F_FL1=%E6%A0%A1%E5%86%85&F_FL2=$',
+                    'process_links' : 'process_links',
+                    'check_url' : True,
+                   },
+                   {
+                    'allow' : r'^http://job.ustb.edu.cn/accms/sites/jobc/zhaopinhuixinxi-content.jsp\?contentId=[0-9]+$',
                     'process_links' : 'process_links',
                     'check_url' : False,
                     'link_type' : LinkType.LEAF
